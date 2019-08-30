@@ -4,7 +4,8 @@ if(length(new.packages)) install.packages(new.packages,repos = "http://cran.us.r
 lapply(list.of.packages, library, character.only = TRUE)
 setwd("~/Bureau/Stage/Work_space")
 
-source("~/Bureau/Stage/data_file.R")
+source("~/Bureau/Stage/GraphCut_climate_simulations_datafile.R")
+source("~/Bureau/Stage/GraphCut_climate_simulations_functionfile.R")
 
 mincut_list_3gcm = list()
 time_list = list()
@@ -12,15 +13,16 @@ k=0
 
 ################################ Choix des données à utiliser ################################
 
-seasons = list(saison="saison") # A choisir entre saisons ("winter","summer","spring" et "fall") ou "annual"
-quant_node = seq(0.10,0.20,by=0.10) # % de biais faibles attribués aux terminaux (attention, pour le domaine "fr", les petits % ne marchent pas)
+seasons = list(winter="winter") # A choisir entre saisons ("winter","summer","spring" et "fall") ou "annual"
+quant_node = seq(0.30,0.40,by=0.10) # % de biais faibles attribués aux terminaux (attention, pour le domaine "fr", les petits % ne marchent pas)
 domaine = list(fr="fr") # Domaine (fr ou eur)
 comb=1 # Combinaison des modèles pour un graph cut à 3 modèles (voir la matrice combinaison ci-dessous)
 models = 1:3 # Nombre de modèles en entrée
+method = list(st="no_st") # Méthode d'attribution des points aux terminaux 
 
-################################ Boucle Graphcut ################################
+# Graphcut n°1 ------------------------------------------------------------
 
-combinaison = combn(models,2) # Matrice de combinaison des modèles
+combinaison = combn(models,2)
 longitude = get(paste("lon_",domaine,"_cnrm",sep=""))
 latitude = get(paste("lat_",domaine,"_cnrm",sep=""))
 
@@ -49,52 +51,8 @@ for (season in seasons){
       poids <- overlap
       indices <- matrix(1:length(poids),ncol=ncol(poids))
       
-      mat.pad <- function(mat1){
-        na1 <- matrix(NA,ncol=1,nrow=nrow(mat1))
-        mat2 <- matrix(c(na1,mat1,na1),nrow=nrow(mat1),ncol=ncol(mat1)+2)
-        na2 <- matrix(NA,nrow=1,ncol=ncol(mat2))
-        mat3 <- rbind(na2,mat2,na2)
-        return(mat3)
-      }
-      
-      locate <- function(matrice){
-        matrice2 <- mat.pad(matrice)
-        x <- 1:length(matrice)
-        ind_row <- 2:(nrow(matrice)+1)
-        ind_col <- 2:(ncol(matrice)+1)
-        neigh = rbind(N  = as.vector(matrice2[ind_row - 1, ind_col    ]),
-                      E  = as.vector(matrice2[ind_row    , ind_col + 1]),
-                      S  = as.vector(matrice2[ind_row + 1, ind_col    ]),
-                      W  = as.vector(matrice2[ind_row    , ind_col - 1]))
-        return(neigh[,x])
-      }
-      
       location <- locate(indices)
       colnames(location) <- 1:ncol(location)
-      
-      test_matgc <- function(matrice){
-        n <- rep(1:length(matrice),each=4)
-        x <- rep(1:4, times=length(matrice))
-        test_matgc <- matrix(c(n,location[x,n]))
-        return(test_matgc)
-      }
-      
-      locate_poids <- function(matrice){
-        matrice2 <- mat.pad(matrice)
-        x <- 1:length(matrice)
-        ind_row <- 2:(nrow(matrice)+1)
-        ind_col <- 2:(ncol(matrice)+1)
-        N  = abs(as.vector(matrice2[ind_row - 1, ind_col    ]) + as.vector(matrice2[ind_row,ind_col]))
-        E  = abs(as.vector(matrice2[ind_row    , ind_col + 1]) + as.vector(matrice2[ind_row,ind_col]))
-        S  = abs(as.vector(matrice2[ind_row + 1, ind_col    ]) + as.vector(matrice2[ind_row,ind_col]))
-        W  = abs(as.vector(matrice2[ind_row    , ind_col - 1]) + as.vector(matrice2[ind_row,ind_col]))
-        if (length(N) == 0) N=c(NA,NA)
-        if (length(E) == 0) E=c(NA,NA)
-        if (length(S) == 0) S=c(NA,NA)
-        if (length(W) == 0) W=c(NA,NA)
-        neigh =  rbind(N,E,S,W)   
-        return(neigh[,x])
-      }
       
       poids2 <- locate_poids(poids)
       
@@ -114,20 +72,9 @@ for (season in seasons){
       
       nodes <- 1:(length(poids)+2)
       
-      locate <- function(matrice){
-        matrice2 <- mat.pad(matrice)
-        x <- 1:length(matrice)
-        ind_row <- 2:(nrow(matrice)+1)
-        ind_col <- 2:(ncol(matrice)+1)
-        neigh = rbind(N  = as.vector(matrice2[ind_row - 1, ind_col    ]),
-                      E  = as.vector(matrice2[ind_row    , ind_col + 1]),
-                      S  = as.vector(matrice2[ind_row + 1, ind_col    ]),
-                      W  = as.vector(matrice2[ind_row    , ind_col - 1]))
-        return(neigh[,x])
-      }
-      
       source_test_3=matrix(1:length(overlap),ncol=1)
       mat_model_source_test <- matrix(get(paste("mat_model",combinaison[2,m],"_low_bias",sep="")),ncol=1)
+      
       for(i in 1:length(overlap)){
         if(!is.na(mat_model_source_test[i])){
           mat_model_source_test[i]=source_test_3[i]
@@ -135,9 +82,9 @@ for (season in seasons){
       }
       source_nodes <- mat_model_source_test[-(which(is.na(mat_model_source_test),arr.ind=TRUE)),]
       
-      
       sink_test_3=matrix(1:(length(overlap)),ncol=1)
       mat_model_sink_test <- matrix(get(paste("mat_model",combinaison[1,m],"_low_bias",sep="")),ncol=1)
+      
       for(i in 1:(length(overlap))){
         if(!is.na(mat_model_sink_test[i])){
           mat_model_sink_test[i]=sink_test_3[i]
@@ -178,6 +125,7 @@ for (season in seasons){
           matrice_source_eroded[i]=get(paste("mat_model",combinaison[2,m],"_low_bias",sep=""))[i]
         }
       }
+      
       for(i in 1:length(overlap)){
         if(matrice_sink_eroded[i] !=0 ){
           matrice_sink_eroded[i]=get(paste("mat_model",combinaison[1,m],"_low_bias",sep=""))[i]
@@ -200,7 +148,7 @@ for (season in seasons){
       }
       
       
-      ################################ Choix d'attribution des nœuds aux terminaux ################################
+#* Choix d'attribution des nœuds aux terminaux du 1er GraphCut ===========================================
       
       no_st <- for(i in 1:length(overlap)){
         if((i %in% source_test_indices_eroded) & (i %in% sink_test_indices_eroded)){
@@ -220,7 +168,7 @@ for (season in seasons){
         }
       }
       
-      st_smallest
+      get(paste(method))
       
       source_test_indices_eroded <- source_test_indices_eroded[which(!is.na(source_test_indices_eroded))]
       sink_test_indices_eroded <- sink_test_indices_eroded[which(!is.na(sink_test_indices_eroded))]
@@ -256,6 +204,13 @@ for (season in seasons){
       }
       
       
+      
+# Graphcut n°2 ------------------------------------------------------------
+      
+      
+      
+      
+      
       for(y in 1:3){
         if ((y %in% combinaison[,m]) == FALSE){
           z = y
@@ -267,52 +222,9 @@ for (season in seasons){
       poids <- overlap
       indices <- matrix(1:length(poids),ncol=ncol(poids))
       
-      mat.pad <- function(mat1){
-        na1 <- matrix(NA,ncol=1,nrow=nrow(mat1))
-        mat2 <- matrix(c(na1,mat1,na1),nrow=nrow(mat1),ncol=ncol(mat1)+2)
-        na2 <- matrix(NA,nrow=1,ncol=ncol(mat2))
-        mat3 <- rbind(na2,mat2,na2)
-        return(mat3)
-      }
-      
-      locate <- function(matrice){
-        matrice2 <- mat.pad(matrice)
-        x <- 1:length(matrice)
-        ind_row <- 2:(nrow(matrice)+1)
-        ind_col <- 2:(ncol(matrice)+1)
-        neigh = rbind(N  = as.vector(matrice2[ind_row - 1, ind_col    ]),
-                      E  = as.vector(matrice2[ind_row    , ind_col + 1]),
-                      S  = as.vector(matrice2[ind_row + 1, ind_col    ]),
-                      W  = as.vector(matrice2[ind_row    , ind_col - 1]))
-        return(neigh[,x])
-      }
-      
       location <- locate(indices)
       colnames(location) <- 1:ncol(location)
       
-      test_matgc <- function(matrice){
-        n <- rep(1:length(matrice),each=4)
-        x <- rep(1:4, times=length(matrice))
-        test_matgc <- matrix(c(n,location[x,n]))
-        return(test_matgc)
-      }
-      
-      locate_poids <- function(matrice){
-        matrice2 <- mat.pad(matrice)
-        x <- 1:length(matrice)
-        ind_row <- 2:(nrow(matrice)+1)
-        ind_col <- 2:(ncol(matrice)+1)
-        N  = abs(as.vector(matrice2[ind_row - 1, ind_col    ]) + as.vector(matrice2[ind_row,ind_col]))
-        E  = abs(as.vector(matrice2[ind_row    , ind_col + 1]) + as.vector(matrice2[ind_row,ind_col]))
-        S  = abs(as.vector(matrice2[ind_row + 1, ind_col    ]) + as.vector(matrice2[ind_row,ind_col]))
-        W  = abs(as.vector(matrice2[ind_row    , ind_col - 1]) + as.vector(matrice2[ind_row,ind_col]))
-        if (length(N) == 0) N=c(NA,NA)
-        if (length(E) == 0) E=c(NA,NA)
-        if (length(S) == 0) S=c(NA,NA)
-        if (length(W) == 0) W=c(NA,NA)
-        neigh =  rbind(N,E,S,W)   
-        return(neigh[,x])
-      }
       
       poids2 <- locate_poids(poids)
       
@@ -331,18 +243,6 @@ for (season in seasons){
       matriceGC2 <- subset(mat_gc, mat_gc[,1] < mat_gc[,2])
       
       nodes <- 1:(length(poids)+2)
-      
-      locate <- function(matrice){
-        matrice2 <- mat.pad(matrice)
-        x <- 1:length(matrice)
-        ind_row <- 2:(nrow(matrice)+1)
-        ind_col <- 2:(ncol(matrice)+1)
-        neigh = rbind(N  = as.vector(matrice2[ind_row - 1, ind_col    ]),
-                      E  = as.vector(matrice2[ind_row    , ind_col + 1]),
-                      S  = as.vector(matrice2[ind_row + 1, ind_col    ]),
-                      W  = as.vector(matrice2[ind_row    , ind_col - 1]))
-        return(neigh[,x])
-      }
       
       source_test_3=matrix(1:length(overlap),ncol=1)
       
@@ -422,7 +322,7 @@ for (season in seasons){
       }
       
       
-      ################################ Choix d'attribution des nœuds aux terminaux ################################
+#* Choix d'attribution des nœuds aux terminaux du 2e GraphCut ==================================
       
       no_st <- for(i in 1:length(overlap)){
         if((i %in% source_test_indices_eroded) & (i %in% sink_test_indices_eroded)){
@@ -442,7 +342,7 @@ for (season in seasons){
         }
       }
       
-      st_smallest
+      get(paste(method))
       
       source_test_indices_eroded <- source_test_indices_eroded[which(!is.na(source_test_indices_eroded))]
       sink_test_indices_eroded <- sink_test_indices_eroded[which(!is.na(sink_test_indices_eroded))]
@@ -491,8 +391,8 @@ for (season in seasons){
       name_model1 <- paste(name_model[combinaison[,m]],sep="")[1]
       name_model2 <- paste(name_model[combinaison[,m]],sep="")[2]
       name_model3 <- paste(name_model[z])
-      save(gc_test_3gcm, file = paste("matrice_graphcut_Q",quant_nodes,"_",season,"_",name_model1,"_",name_model2,"_",name_model3,"_","_",domaine,".RData",sep = ""))
-      pdf(paste("Q",quant_nodes,"_","multi","_","mean","_",season,"_",name_model1,"_",name_model2,"_",name_model3,"_",domaine,".pdf",sep = ""),width = 10,height = 15)
+      save(gc_test_3gcm, file = paste("matrice_graphcut_Q",quant_nodes,"_",season,"_",name_model1,"_",name_model2,"_",name_model3,"_","_",domaine,"_",method,".RData",sep = ""))
+      pdf(paste("Q",quant_nodes,"_","multi","_","mean","_",season,"_",name_model1,"_",name_model2,"_",name_model3,"_",domaine,"_",method,".pdf",sep = ""),width = 10,height = 15)
       image.plot(longitude,latitude,gc_test_3gcm,
                  main=paste("Carte GC biais ",name_model1,"/",name_model2,"/",name_model3," - ",season,sep=" "),
                  xlab="Longitude",
