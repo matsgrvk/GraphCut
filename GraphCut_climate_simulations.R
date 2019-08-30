@@ -2,10 +2,9 @@ list.of.packages <- c("optrees", "ncdf4","fields","maps","mapdata","mmand")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages,repos = "http://cran.us.r-project.org")
 lapply(list.of.packages, library, character.only = TRUE)
-setwd("~/Bureau/Stage/Work_space")
 
-source("~/Bureau/Stage/GraphCut_climate_simulations_datafile.R")
-source("~/Bureau/Stage/GraphCut_climate_simulations_functionfile.R")
+source("GraphCut_climate_simulations_datafile.R")
+source("GraphCut_climate_simulations_functionfile.R")
 
 mincut_list_3gcm = list()
 time_list = list()
@@ -14,13 +13,13 @@ k=0
 ################################ Choix des données à utiliser ################################
 
 seasons = list(winter="winter") # A choisir entre saisons ("winter","summer","spring" et "fall") ou "annual"
-quant_node = seq(0.30,0.40,by=0.10) # % de biais faibles attribués aux terminaux (attention, pour le domaine "fr", les petits % ne marchent pas)
+quant_node = seq(0.30,0.40,by=0.10) # % de biais faibles attribués aux terminaux entre 0 et 1 (attention, pour le domaine "fr", les petits % ne marchent pas)
 domaine = list(fr="fr") # Domaine (fr ou eur)
 comb=1 # Combinaison des modèles pour un graph cut à 3 modèles (voir la matrice combinaison ci-dessous)
 models = 1:3 # Nombre de modèles en entrée
-method = list(st="no_st") # Méthode d'attribution des points aux terminaux 
+method = list(st="st_smallest") # Méthode d'attribution des points aux terminaux ("no_st" ou "st_smallest")
 
-# Graphcut n°1 ------------------------------------------------------------
+#* Graphcut n°1 ------------------------------------------------------------
 
 combinaison = combn(models,2)
 longitude = get(paste("lon_",domaine,"_cnrm",sep=""))
@@ -148,7 +147,7 @@ for (season in seasons){
       }
       
       
-#* Choix d'attribution des nœuds aux terminaux du 1er GraphCut ===========================================
+#** Choix d'attribution des nœuds aux terminaux du 1er GraphCut ===========================================
       
       no_st <- for(i in 1:length(overlap)){
         if((i %in% source_test_indices_eroded) & (i %in% sink_test_indices_eroded)){
@@ -205,7 +204,7 @@ for (season in seasons){
       
       
       
-# Graphcut n°2 ------------------------------------------------------------
+#* Graphcut n°2 ------------------------------------------------------------
       
       
       
@@ -322,27 +321,29 @@ for (season in seasons){
       }
       
       
-#* Choix d'attribution des nœuds aux terminaux du 2e GraphCut ==================================
+#** Choix d'attribution des nœuds aux terminaux du 2e GraphCut ==================================
       
-      no_st <- for(i in 1:length(overlap)){
-        if((i %in% source_test_indices_eroded) & (i %in% sink_test_indices_eroded)){
-          source_test_indices_eroded[source_test_indices_eroded==i] <- NA
-          sink_test_indices_eroded[sink_test_indices_eroded==i] <- NA
-        }
-      }
-      
-      diff = matrix(gc_test_2gcm-(get(paste("mat_model",y,"_low_bias",sep=""))),ncol=1)
-      
-      st_smallest <- for(i in 1:length(overlap)){
-        if((i %in% source_test_indices_eroded) & (i %in% sink_test_indices_eroded)){
-          if(diff[i] < 0){
+      if(method=="no_st"){
+        no_st <- for(i in 1:length(overlap)){
+          if((i %in% source_test_indices_eroded) & (i %in% sink_test_indices_eroded)){
+            source_test_indices_eroded[source_test_indices_eroded==i] <- NA
             sink_test_indices_eroded[sink_test_indices_eroded==i] <- NA
           }
-          else source_test_indices_eroded[source_test_indices_eroded==i] <- NA
         }
       }
       
-      get(paste(method))
+      if(method=="st_smallest"){
+        diff = matrix(gc_test_2gcm-(get(paste("mat_model",y,"_low_bias",sep=""))),ncol=1)
+        
+        st_smallest <- for(i in 1:length(overlap)){
+          if((i %in% source_test_indices_eroded) & (i %in% sink_test_indices_eroded)){
+            if(diff[i] < 0){
+              sink_test_indices_eroded[sink_test_indices_eroded==i] <- NA
+            }
+            else source_test_indices_eroded[source_test_indices_eroded==i] <- NA
+          }
+        }
+      }
       
       source_test_indices_eroded <- source_test_indices_eroded[which(!is.na(source_test_indices_eroded))]
       sink_test_indices_eroded <- sink_test_indices_eroded[which(!is.na(sink_test_indices_eroded))]
@@ -386,21 +387,24 @@ for (season in seasons){
         else gc_test_3gcm[i]=gc_test_2gcm[i]
       }
       
+# Réalisation de la carte du GraphCut ------------------------------------------------------------
+      
       name_model=c("CNRM","IPSL","MPI")
       paste(name_model[combinaison[,m]],sep="")
       name_model1 <- paste(name_model[combinaison[,m]],sep="")[1]
       name_model2 <- paste(name_model[combinaison[,m]],sep="")[2]
       name_model3 <- paste(name_model[z])
       save(gc_test_3gcm, file = paste("matrice_graphcut_Q",quant_nodes,"_",season,"_",name_model1,"_",name_model2,"_",name_model3,"_","_",domaine,"_",method,".RData",sep = ""))
-      pdf(paste("Q",quant_nodes,"_","multi","_","mean","_",season,"_",name_model1,"_",name_model2,"_",name_model3,"_",domaine,"_",method,".pdf",sep = ""),width = 10,height = 15)
+      pdf(paste("Q",quant_nodes*100,"_","multi","_",season,"_",name_model1,"_",name_model2,"_",name_model3,"_",domaine,"_",method,".pdf",sep = ""),width = 10,height = 15)
       image.plot(longitude,latitude,gc_test_3gcm,
-                 main=paste("Carte GC biais ",name_model1,"/",name_model2,"/",name_model3," - ",season,sep=" "),
+                 main=paste("Graphcut des biais multivariés de température et de précipitations",name_model1,"/",name_model2,"/",name_model3," - ",season,sep=" "),
                  xlab="Longitude",
                  ylab="Latitude",
                  zlim=c(min(get(paste(domaine,"_biais_",season,sep=""))),max(get(paste(domaine,"_biais_",season,sep="")))),
                  col=colorTable)
       lines(get(paste(domaine)))
       mtext(paste("Pourcentage de points de grille correspondant à un biais faible attribués aux terminaux : ",quant_nodes*100,"%",sep=""),side=1,line = 4)
+      mtext(paste("Méthode utilisée : ",method,sep=""),side=3,line=0)
       
       x_pts <- matrix(seq(min(longitude),max(longitude),by=0.75),nrow=length(gc_test_3gcm))
       y_pts <- matrix(rep(seq(min(latitude),max(latitude),by=0.75),each=nrow(gc_test_3gcm)))

@@ -3,11 +3,13 @@ new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"
 if(length(new.packages)) install.packages(new.packages,repos = "http://cran.us.r-project.org")
 lapply(list.of.packages, library, character.only = TRUE)
 
-nc <- nc_open("t2_erai_clim_1979_2008.nc")
-nc_erai_winter <- nc_open("t2_erai_clim_1979_2008_DJF.nc")
-nc_erai_summer <- nc_open("t2_erai_clim_1979_2008_JJA.nc")
-nc_erai_spring <- nc_open("t2_erai_clim_1979_2008_MAM.nc")
-nc_erai_fall <- nc_open("t2_erai_clim_1979_2008_SON.nc")
+# Chargement des donneés issues de fichiers netCDF --------
+
+nc <- nc_open("Work_space/t2_erai_clim_1979_2008.nc")
+nc_erai_winter <- nc_open("Work_space/t2_erai_clim_1979_2008_DJF.nc")
+nc_erai_summer <- nc_open("Work_space/t2_erai_clim_1979_2008_JJA.nc")
+nc_erai_spring <- nc_open("Work_space/t2_erai_clim_1979_2008_MAM.nc")
+nc_erai_fall <- nc_open("Work_space/t2_erai_clim_1979_2008_SON.nc")
 
 tas_erai_annual = ncvar_get(nc, varid = "t2")
 tas_erai_winter = ncvar_get(nc_erai_winter, varid = "t2")
@@ -32,11 +34,11 @@ nc_close(nc_erai_summer)
 nc_close(nc_erai_spring)
 nc_close(nc_erai_fall)
 
-nc2 <- nc_open("tas_cnrm_clim_1979_2008.nc")
-nc_cnrm_winter <- nc_open("tas_cnrm_clim_1979_2008_DJF.nc")
-nc_cnrm_summer <- nc_open("tas_cnrm_clim_1979_2008_JJA.nc")
-nc_cnrm_spring <- nc_open("tas_cnrm_clim_1979_2008_MAM.nc")
-nc_cnrm_fall <- nc_open("tas_cnrm_clim_1979_2008_SON.nc")
+nc2 <- nc_open("Work_space/tas_cnrm_clim_1979_2008.nc")
+nc_cnrm_winter <- nc_open("Work_space/tas_cnrm_clim_1979_2008_DJF.nc")
+nc_cnrm_summer <- nc_open("Work_space/tas_cnrm_clim_1979_2008_JJA.nc")
+nc_cnrm_spring <- nc_open("Work_space/tas_cnrm_clim_1979_2008_MAM.nc")
+nc_cnrm_fall <- nc_open("Work_space/tas_cnrm_clim_1979_2008_SON.nc")
 
 tas_cnrm_annual = ncvar_get(nc2, varid = "tas")
 tas_cnrm_winter = ncvar_get(nc_cnrm_winter, varid = "tas")
@@ -61,11 +63,11 @@ nc_close(nc_cnrm_summer)
 nc_close(nc_cnrm_spring)
 nc_close(nc_cnrm_fall)
 
-nc3 <- nc_open("tas_ipsl_clim_1979_2008.nc")
-nc_ipsl_winter <- nc_open("tas_ipsl_clim_1979_2008_DJF.nc")
-nc_ipsl_summer <- nc_open("tas_ipsl_clim_1979_2008_JJA.nc")
-nc_ipsl_spring <- nc_open("tas_ipsl_clim_1979_2008_MAM.nc")
-nc_ipsl_fall <- nc_open("tas_ipsl_clim_1979_2008_SON.nc")
+nc3 <- nc_open("Work_space/tas_ipsl_clim_1979_2008.nc")
+nc_ipsl_winter <- nc_open("Work_space/tas_ipsl_clim_1979_2008_DJF.nc")
+nc_ipsl_summer <- nc_open("Work_space/tas_ipsl_clim_1979_2008_JJA.nc")
+nc_ipsl_spring <- nc_open("Work_space/tas_ipsl_clim_1979_2008_MAM.nc")
+nc_ipsl_fall <- nc_open("Work_space/tas_ipsl_clim_1979_2008_SON.nc")
 
 tas_ipsl_annual = ncvar_get(nc3, varid = "tas")
 tas_ipsl_winter = ncvar_get(nc_ipsl_winter, varid = "tas")
@@ -89,11 +91,11 @@ nc_close(nc_ipsl_summer)
 nc_close(nc_ipsl_spring)
 nc_close(nc_ipsl_fall)
 
-nc4 <- nc_open("tas_mpi_clim_1979-01-01,2008-12-31.nc")
-nc_mpi_winter <- nc_open("tas_mpi_clim_1979-01-01,2008-12-31_DJF.nc")
-nc_mpi_summer <- nc_open("tas_mpi_clim_1979-01-01,2008-12-31_JJA.nc")
-nc_mpi_spring <- nc_open("tas_mpi_clim_1979-01-01,2008-12-31_MAM.nc")
-nc_mpi_fall <- nc_open("tas_mpi_clim_1979-01-01,2008-12-31_SON.nc")
+nc4 <- nc_open("Work_space/tas_mpi_clim_1979-01-01,2008-12-31.nc")
+nc_mpi_winter <- nc_open("Work_space/tas_mpi_clim_1979-01-01,2008-12-31_DJF.nc")
+nc_mpi_summer <- nc_open("Work_space/tas_mpi_clim_1979-01-01,2008-12-31_JJA.nc")
+nc_mpi_spring <- nc_open("Work_space/tas_mpi_clim_1979-01-01,2008-12-31_MAM.nc")
+nc_mpi_fall <- nc_open("Work_space/tas_mpi_clim_1979-01-01,2008-12-31_SON.nc")
 
 tas_mpi_annual = ncvar_get(nc4, varid = "tas")
 tas_mpi_winter = ncvar_get(nc_mpi_winter, varid = "tas")
@@ -130,11 +132,11 @@ mpi_biais_tas_spring <- tas_mpi_spring-tas_erai_spring
 mpi_biais_tas_fall <- tas_mpi_fall-tas_erai_fall
 
 
-nc5 <- nc_open("tp_erai_clim_1979_2008.nc")
-nc_pr_erai_winter <- nc_open("tp_erai_clim_1979_2008_DJF.nc")
-nc_pr_erai_summer <- nc_open("tp_erai_clim_1979_2008_JJA.nc")
-nc_pr_erai_spring <- nc_open("tp_erai_clim_1979_2008_MAM.nc")
-nc_pr_erai_fall <- nc_open("tp_erai_clim_1979_2008_SON.nc")
+nc5 <- nc_open("Work_space/tp_erai_clim_1979_2008.nc")
+nc_pr_erai_winter <- nc_open("Work_space/tp_erai_clim_1979_2008_DJF.nc")
+nc_pr_erai_summer <- nc_open("Work_space/tp_erai_clim_1979_2008_JJA.nc")
+nc_pr_erai_spring <- nc_open("Work_space/tp_erai_clim_1979_2008_MAM.nc")
+nc_pr_erai_fall <- nc_open("Work_space/tp_erai_clim_1979_2008_SON.nc")
 
 pr_erai_annual = ncvar_get(nc5, varid = "tp")
 pr_erai_winter = ncvar_get(nc_pr_erai_winter, varid = "tp")
@@ -159,11 +161,11 @@ nc_close(nc_pr_erai_summer)
 nc_close(nc_pr_erai_spring)
 nc_close(nc_pr_erai_fall)
 
-nc6 <- nc_open("pr_cnrm_clim_1979-01-01,2008-12-31.nc")
-nc_pr_cnrm_winter <- nc_open("pr_cnrm_clim_1979-01-01,2008-12-31_DJF.nc")
-nc_pr_cnrm_summer <- nc_open("pr_cnrm_clim_1979-01-01,2008-12-31_JJA.nc")
-nc_pr_cnrm_spring <- nc_open("pr_cnrm_clim_1979-01-01,2008-12-31_MAM.nc")
-nc_pr_cnrm_fall <- nc_open("pr_cnrm_clim_1979-01-01,2008-12-31_SON.nc")
+nc6 <- nc_open("Work_space/pr_cnrm_clim_1979-01-01,2008-12-31.nc")
+nc_pr_cnrm_winter <- nc_open("Work_space/pr_cnrm_clim_1979-01-01,2008-12-31_DJF.nc")
+nc_pr_cnrm_summer <- nc_open("Work_space/pr_cnrm_clim_1979-01-01,2008-12-31_JJA.nc")
+nc_pr_cnrm_spring <- nc_open("Work_space/pr_cnrm_clim_1979-01-01,2008-12-31_MAM.nc")
+nc_pr_cnrm_fall <- nc_open("Work_space/pr_cnrm_clim_1979-01-01,2008-12-31_SON.nc")
 
 pr_cnrm_annual = ncvar_get(nc6, varid = "pr")
 pr_cnrm_winter = ncvar_get(nc_pr_cnrm_winter, varid = "pr")
@@ -187,11 +189,11 @@ nc_close(nc_pr_cnrm_summer)
 nc_close(nc_pr_cnrm_spring)
 nc_close(nc_pr_cnrm_fall)
 
-nc7 <- nc_open("pr_ipsl_clim_1979-01-01,2008-12-31.nc")
-nc_pr_ipsl_winter <- nc_open("pr_ipsl_clim_1979-01-01,2008-12-31_DJF.nc")
-nc_pr_ipsl_summer <- nc_open("pr_ipsl_clim_1979-01-01,2008-12-31_JJA.nc")
-nc_pr_ipsl_spring <- nc_open("pr_ipsl_clim_1979-01-01,2008-12-31_MAM.nc")
-nc_pr_ipsl_fall <- nc_open("pr_ipsl_clim_1979-01-01,2008-12-31_SON.nc")
+nc7 <- nc_open("Work_space/pr_ipsl_clim_1979-01-01,2008-12-31.nc")
+nc_pr_ipsl_winter <- nc_open("Work_space/pr_ipsl_clim_1979-01-01,2008-12-31_DJF.nc")
+nc_pr_ipsl_summer <- nc_open("Work_space/pr_ipsl_clim_1979-01-01,2008-12-31_JJA.nc")
+nc_pr_ipsl_spring <- nc_open("Work_space/pr_ipsl_clim_1979-01-01,2008-12-31_MAM.nc")
+nc_pr_ipsl_fall <- nc_open("Work_space/pr_ipsl_clim_1979-01-01,2008-12-31_SON.nc")
 
 pr_ipsl_annual = ncvar_get(nc7, varid = "pr")
 pr_ipsl_winter = ncvar_get(nc_pr_ipsl_winter, varid = "pr")
@@ -215,11 +217,11 @@ nc_close(nc_pr_ipsl_summer)
 nc_close(nc_pr_ipsl_spring)
 nc_close(nc_pr_ipsl_fall)
 
-nc8 <- nc_open("pr_mpi_clim_1979-01-01,2008-12-31.nc")
-nc_pr_mpi_winter <- nc_open("pr_mpi_clim_1979-01-01,2008-12-31_DJF.nc")
-nc_pr_mpi_summer <- nc_open("pr_mpi_clim_1979-01-01,2008-12-31_JJA.nc")
-nc_pr_mpi_spring <- nc_open("pr_mpi_clim_1979-01-01,2008-12-31_MAM.nc")
-nc_pr_mpi_fall <- nc_open("pr_mpi_clim_1979-01-01,2008-12-31_SON.nc")
+nc8 <- nc_open("Work_space/pr_mpi_clim_1979-01-01,2008-12-31.nc")
+nc_pr_mpi_winter <- nc_open("Work_space/pr_mpi_clim_1979-01-01,2008-12-31_DJF.nc")
+nc_pr_mpi_summer <- nc_open("Work_space/pr_mpi_clim_1979-01-01,2008-12-31_JJA.nc")
+nc_pr_mpi_spring <- nc_open("Work_space/pr_mpi_clim_1979-01-01,2008-12-31_MAM.nc")
+nc_pr_mpi_fall <- nc_open("Work_space/pr_mpi_clim_1979-01-01,2008-12-31_SON.nc")
 
 pr_mpi_annual = ncvar_get(nc8, varid = "pr")
 pr_mpi_winter = ncvar_get(nc_pr_ipsl_winter, varid = "pr")
@@ -279,6 +281,8 @@ mpi_biais_pr_summer <- pr_mpi_summer-pr_erai_summer
 mpi_biais_pr_spring <- pr_mpi_spring-pr_erai_spring
 mpi_biais_pr_fall <- pr_mpi_fall-pr_erai_fall
 
+#* Données utilisées dans le code (à modifier si besoin)-----------
+
 biais_model1_unscale_annual <- cnrm_biais_tas_annual-cnrm_biais_pr_annual
 biais_model1_unscale_winter <- cnrm_biais_tas_winter-cnrm_biais_pr_winter
 biais_model1_unscale_summer <- cnrm_biais_tas_summer-cnrm_biais_pr_summer
@@ -317,9 +321,7 @@ biais_model3_fall <- scale(biais_model3_unscale_fall)
 
 colorTable<- designer.colors(64, c( "blue","grey90", "red"))
 
-############################################ Settings biais ############################################
-
-# Frontières 
+# Modification des données pour les domaines utilisés ------- 
 eur = map(xlim=c(-20.25,60),
           ylim=c(34.5,75),
           plot=FALSE)
@@ -466,7 +468,8 @@ pr_fr_erai_summer <- rbind(pr_erai_summer[474:480,175:194],pr_erai_summer[1:13,1
 pr_fr_erai_spring <- rbind(pr_erai_spring[474:480,175:194],pr_erai_spring[1:13,175:194])
 pr_fr_erai_spring <- rbind(pr_erai_fall[474:480,175:194],pr_erai_fall[1:13,175:194])
 
-# Zlim
+#* Données permettant la création des zlim pour les plots ----------
+
 eur_biais_annual = c(biais_model1_eur_annual,biais_model2_eur_annual,biais_model3_eur_annual)
 eur_tas_annual = c(tas_eur_cnrm_annual,tas_eur_ipsl_annual,tas_eur_erai_annual,tas_eur_mpi_annual)
 eur_pr_annual = c(pr_eur_cnrm_annual,pr_eur_ipsl_annual,pr_eur_erai_annual,pr_eur_mpi_annual)
