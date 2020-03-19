@@ -6,10 +6,9 @@ lapply(list.of.packages, library, character.only = TRUE)
 install_github("thaos/gcoWrapR")
 library(gcoWrapR)
 
-setwd("/home/users/mgarvik/GC_M2/workspace/")
 load("models_list.rdata")
-source("load_tas.R")
-setwd("/home/users/mgarvik/GC_M2/workspace/")
+load("load_tas_spaef.rdata")
+
 colorTable<- designer.colors(64, c( "blue","grey90", "red"))
 
 nc_ERAI <- nc_open("tmp_tas_30Ayr_ERA5_197901_200812.nc")
@@ -48,16 +47,16 @@ for (i in 1:length(model)){
   assign(paste0("lab",i,"_2038"), ref)
   assign(paste0("lab",i,"_2038"), get(paste0("tas_",model_version[i],"_2038")))
   lab_list_2038[i] <-list(get(paste0("lab",i,"_2038")))
-  assign(paste0("lab",i,"_2100"), ref)
-  assign(paste0("lab",i,"_2100"), get(paste0("tas_",model_version[i],"_2100")))
-  lab_list_2100[i] <-list(get(paste0("lab",i,"_2100")))
+  # assign(paste0("lab",i,"_2100"), ref)
+  # assign(paste0("lab",i,"_2100"), get(paste0("tas_",model_version[i],"_2100")))
+  # lab_list_2100[i] <-list(get(paste0("lab",i,"_2100")))
 }
 
 ref=tas_ref
 
 labs <- sapply(lab_list, identity, simplify = "array")
 labs_2038 <- sapply(lab_list_2038, identity, simplify = "array")
-labs_2100 <- sapply(lab_list_2100, identity, simplify = "array")
+# labs_2100 <- sapply(lab_list_2100, identity, simplify = "array")
 labs_c <- labs-273.15
 bias <- sapply(bias_list, identity, simplify = "array")
 bias_2 = bias
