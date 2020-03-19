@@ -5,8 +5,8 @@ lapply(list.of.packages, library, character.only = TRUE)
 install_github("thaos/gcoWrapR")
 library(gcoWrapR)
 
-load("workspace/spaef_env.rdata")
-load("workspace/weight_mat_p0_2038.rdata")
+load("spaef_env.rdata")
+load("weight_mat_p0_2038.rdata")
 
 spaef = alpha = beta = gamma = vector("list",321)
 
