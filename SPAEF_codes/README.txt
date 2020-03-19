@@ -1,8 +1,10 @@
+Working directory = workspace Obelix
+
 1. Run optimisation_poids_crossvalidation.R
 
 Script qui permet de lancer le grid search.
 
-models_list.rdata + load_tas_spaef.R : permettent de charger dans l'environnement les températures des modèles utilisés pour le graph cut.
+models_list.rdata + load_tas_spaef.rdata : permettent de charger dans l'environnement les températures des modèles utilisés pour le graph cut.
 
 Après l'algo de l'AB-swap (l.111), création de la matrice de labels (mat_gco_label_world), ainsi que de la matrice des températures (tas_GC)
 
