@@ -122,12 +122,26 @@ weight_test <- function(iter, p0, p1) {
     for(x in 1:height){
       for(i in 0:(length(model)-1)){
         if(mat_gco_label_world[x,y] == i){
-          tas_GC[x,y] = labs_2100[x,y,(i+1)]
+          tas_GC[x,y] = labs_2038[x,y,(i+1)]
         } 
       }
     }
   }
   
+
+  bias_GC <- mat_gco_label_world
+  
+  for(y in 1:width){
+    for(x in 1:height){
+      for(i in 0:(length(model)-1)){
+        if(mat_gco_label_world[x,y] == i){
+          bias_GC[x,y] = bias_2[x,y,(i+1)]
+        } 
+      }
+    }
+  }
+  
+
   t=0
   
   spaef <- function(models){
@@ -183,11 +197,11 @@ weight_test <- function(iter, p0, p1) {
   
   t=t+1
   
-  weight_spaef = vector(mode="list",length=321)
+  weight_spaef = bias_tas_gc = vector(mode="list",length=321)
   weight_spaef[[t]] <- list("SPAEF" = spaef_GC, "Label attribution" = mat_gco_label_world)
-  
+  bias_tas_gc[[t]] <- list("Tas" = tas_GC, "Bias" = bias_GC
 }
 
-weight_mat_p0_2100 <- grid_search(weight_test, params=list(p0 = c(seq(0,0.01,0.0001),seq(0.01,1,0.01),seq(1.1,10,0.1),seq(11,40,1))), n.iter=1,output="list")
-save(weight_mat_p0_2100, file="weight_mat_p0_2100.rdata")
+weight_mat_p0_2038 <- grid_search(weight_test, params=list(p0 = c(seq(0,0.01,0.0001),seq(0.01,1,0.01),seq(1.1,10,0.1),seq(11,40,1))), n.iter=1,output="list")
+save(weight_mat_p0_2038, file="weight_mat_p0_2038.rdata")
 
