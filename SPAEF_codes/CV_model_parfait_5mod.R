@@ -6,10 +6,10 @@ lapply(list.of.packages, library, character.only = TRUE)
 install_github("thaos/gcoWrapR")
 library(gcoWrapR)
 
-setwd("/home/users/mgarvik/GC_M2/workspace/")
-load("models_list.rdata")
-source("load_tas_CV.R")
-setwd("/home/users/mgarvik/GC_M2/workspace/")
+# setwd("/home/users/mgarvik/GC_M2/workspace/")
+# load("models_list.rdata")
+# source("load_tas_CV.R")
+# setwd("/home/users/mgarvik/GC_M2/workspace/")
 
 colorTable<- designer.colors(64, c( "blue","grey90", "red"))
 
