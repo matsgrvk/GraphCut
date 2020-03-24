@@ -1,3 +1,8 @@
+24/03 : Ajout CV_model_parfait_5mod.R (.rdata à charger : load_tas_spaef.rdata et models_list.rdata)
+
+En essayant de lancer 1 à 1 les lignes du code à l'intérieur de la boucle et même après modification du code, l'algo tourne indéfiniment.
+
+
 Working directory = workspace Obelix
 
 1. Run optimisation_poids_crossvalidation.R
