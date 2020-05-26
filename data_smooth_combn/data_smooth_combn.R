@@ -3,7 +3,7 @@ list.of.packages <- c("ncdf4","fields","maps","mapdata","RcppXPtrUtils","devtool
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages,repos = "http://cran.us.r-project.org")
 lapply(list.of.packages, library, character.only = TRUE)
-# install_github("thaos/gcoWrapR")
+install_github("thaos/gcoWrapR")
 library(gcoWrapR)
 
 # setwd("/home/users/mgarvik/GC_M2/workspace/")
